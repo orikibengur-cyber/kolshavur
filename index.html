@@ -167,6 +167,8 @@ footer{text-align:center;color:var(--dim);font-size:11.5px;margin-top:22px;line-
   <button class="btn go" id="clipBtn" data-t="clipRead" onclick="clipSpeak()"
           style="font-size:22px;padding:26px;margin-bottom:12px"></button>
 
+  <div class="note hide" id="iosTipB" data-t="iosTipB" style="margin:0 0 12px"></div>
+
   <div class="card">
     <h2 data-t="b1"></h2>
     <textarea id="txtB" oninput="syncB()"></textarea>
@@ -262,7 +264,7 @@ const $ = id => document.getElementById(id);
 ['fileIn','fname','player','runA','barA','stA','outA','srcA','drop','aOut',
 'outAHead','srcAHead','txtB','runB','stB','outB','outBHead','bSrc','bOut',
 'rate','rateV','voice','vsrc','model','engine','stD','caps','diag','lang',
-'tabA','tabB','paneA','paneB','iosTip','shareTip','bigPlay','clipBtn'].forEach(i => window[i] = $(i));
+'tabA','tabB','paneA','paneB','iosTip','shareTip','bigPlay','clipBtn','iosTipB'].forEach(i => window[i] = $(i));
 const T = {
 he:{
 appName:'קול־שבור', appSub:'הקלטה ← טקסט · טקסט ← קול · עברית ⇄ אנגלית',
@@ -319,6 +321,7 @@ noVoiceInstalled:'— אין קול {0} מותקן —', voicesPill:'קולות:
 pickOnline:'⚠ אין קול {0} מותקן — בחר "מקוון".',
 ttsFailDevice:'⚠ הקול המקוון נכשל — עובר לקול המכשיר.',
 ttsFailNet:'⚠ הקול המקוון נכשל. בדוק חיבור לאינטרנט.',
+iosTipB:'<b>באייפון:</b> אחרי ההקשה, אייפון יציג כפתור "הדבק" קטן — הקש עליו כדי לאשר גישה ללוח.',
 clipRead:'📋 העתקת הודעה? הקש כאן להקראה', bigPlay:'▶ הקש להשמעה', autoplayBlocked:'הדפדפן חסם השמעה אוטומטית — הקש על הכפתור הגדול.',
 voiceHelp:'⚠ התרגום מוכן למעלה — אבל אין קול {0} מותקן במכשיר, והקול המקוון לא זמין. {1}',
 hintWin:'ב-Windows, לכרום אין קול עברי — הקולות המובנים שלו לא כוללים עברית, וקולות שמותקנים דרך ההגדרות אינם נראים לכרום. נסה לפתוח את הדף ב-Microsoft Edge, שבו בדרך כלל יש קול עברי, או השתמש בטלפון.',
@@ -395,12 +398,14 @@ noVoiceInstalled:'— no {0} voice installed —', voicesPill:'voices: {0} he ·
 pickOnline:'⚠ No {0} voice installed — choose "Online".',
 ttsFailDevice:'⚠ Online voice failed — switching to the device voice.',
 ttsFailNet:'⚠ Online voice failed. Check your connection.',
+iosTipB:'<b>באייפון:</b> אחרי ההקשה, אייפון יציג כפתור "הדבק" קטן — הקש עליו כדי לאשר גישה ללוח.',
 clipRead:'📋 העתקת הודעה? הקש כאן להקראה', bigPlay:'▶ הקש להשמעה', autoplayBlocked:'הדפדפן חסם השמעה אוטומטית — הקש על הכפתור הגדול.',
 voiceHelp:'⚠ התרגום מוכן למעלה — אבל אין קול {0} מותקן במכשיר, והקול המקוון לא זמין. {1}',
 hintWin:'ב-Windows, לכרום אין קול עברי — הקולות המובנים שלו לא כוללים עברית, וקולות שמותקנים דרך ההגדרות אינם נראים לכרום. נסה לפתוח את הדף ב-Microsoft Edge, שבו בדרך כלל יש קול עברי, או השתמש בטלפון.',
 hintAndroid:'באנדרואיד: הגדרות ← נגישות ← פלט טקסט לדיבור ← גלגל השיניים ← התקן נתוני קול ← עברית.',
 hintIOS:'באייפון: הגדרות ← נגישות ← תוכן מדובר ← קולות ← עברית.',
 hintOther:'התקן קול {0} במערכת ההפעלה ורענן את הדף.',
+iosTipB:'<b>On iPhone:</b> after tapping, iOS shows a small "Paste" button — tap it to allow clipboard access.',
 clipRead:'📋 Copied a message? Tap to hear it', bigPlay:'▶ Tap to play', autoplayBlocked:'The browser blocked autoplay — tap the big button.',
 voiceHelp:'⚠ The translation is ready above — but no {0} voice is installed on this device, and the online voice is unavailable. {1}',
 hintWin:'On Windows, Chrome has no Hebrew voice — its bundled voices exclude Hebrew, and voices installed through Settings are not visible to Chrome. Try opening this page in Microsoft Edge, which usually has one, or use your phone.',
@@ -853,14 +858,31 @@ if (!x) return;
 await goB();
 ensurePlaying(outB.textContent, bOut.value);
 };
+async function handleSayFragment() {
+const m = (location.hash || '').match(/^#say=(.*)$/s);
+if (!m) return false;
+let x = '';
+try { x = decodeURIComponent(m[1].replace(/\+/g, ' ')).trim(); } catch { x = m[1]; }
+history.replaceState({}, '', location.pathname);
+if (!x) return false;
+setTab('B'); txtB.value = x; syncB();
+delete stB.dataset.k;
+unlockAudio();
+await goB();
+ensurePlaying(outB.textContent, bOut.value);
+return true;
+}
 const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent);
 (isIOS ? iosTip : shareTip).classList.remove('hide');
+if (isIOS) iosTipB.classList.remove('hide');
 loadPrefs();
 applyLang();
 if (localStorage.getItem('vb-tab') === 'B' && !new URLSearchParams(location.search).get('shared')) setTab('B');
 runDiag(false);
 setTimeout(loadVoices, 400); setTimeout(loadVoices, 1500);
+addEventListener('hashchange', () => handleSayFragment());
 (async () => {
+if (await handleSayFragment()) return;
 const kind = new URLSearchParams(location.search).get('shared');
 if (!kind || !window.caches) return;
 try {
