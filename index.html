@@ -313,6 +313,11 @@ noVoiceInstalled:'— אין קול {0} מותקן —', voicesPill:'קולות:
 pickOnline:'⚠ אין קול {0} מותקן — בחר "מקוון".',
 ttsFailDevice:'⚠ הקול המקוון נכשל — עובר לקול המכשיר.',
 ttsFailNet:'⚠ הקול המקוון נכשל. בדוק חיבור לאינטרנט.',
+voiceHelp:'⚠ התרגום מוכן למעלה — אבל אין קול {0} מותקן במכשיר, והקול המקוון לא זמין. {1}',
+hintWin:'ב-Windows: הגדרות ← שעה ושפה ← שפה ואזור ← הוסף שפה ← עברית, וסמן "טקסט לדיבור". אחר כך רענן את הדף.',
+hintAndroid:'באנדרואיד: הגדרות ← נגישות ← פלט טקסט לדיבור ← גלגל השיניים ← התקן נתוני קול ← עברית.',
+hintIOS:'באייפון: הגדרות ← נגישות ← תוכן מדובר ← קולות ← עברית.',
+hintOther:'התקן קול {0} במערכת ההפעלה ורענן את הדף.',
 testHe:'שלום, זהו מבחן קול בעברית. אם אתה שומע את המשפט הזה, הכול עובד.',
 testEn:'Hello, this is an English voice test. If you can hear this, everything works.',
 dAudio:'פענוח שמע', dSpeech:'מנוע דיבור', dVoiceHe:'קול עברי', dVoiceEn:'קול אנגלי',
@@ -383,6 +388,16 @@ noVoiceInstalled:'— no {0} voice installed —', voicesPill:'voices: {0} he ·
 pickOnline:'⚠ No {0} voice installed — choose "Online".',
 ttsFailDevice:'⚠ Online voice failed — switching to the device voice.',
 ttsFailNet:'⚠ Online voice failed. Check your connection.',
+voiceHelp:'⚠ התרגום מוכן למעלה — אבל אין קול {0} מותקן במכשיר, והקול המקוון לא זמין. {1}',
+hintWin:'ב-Windows: הגדרות ← שעה ושפה ← שפה ואזור ← הוסף שפה ← עברית, וסמן "טקסט לדיבור". אחר כך רענן את הדף.',
+hintAndroid:'באנדרואיד: הגדרות ← נגישות ← פלט טקסט לדיבור ← גלגל השיניים ← התקן נתוני קול ← עברית.',
+hintIOS:'באייפון: הגדרות ← נגישות ← תוכן מדובר ← קולות ← עברית.',
+hintOther:'התקן קול {0} במערכת ההפעלה ורענן את הדף.',
+voiceHelp:'⚠ The translation is ready above — but no {0} voice is installed on this device, and the online voice is unavailable. {1}',
+hintWin:'On Windows: Settings → Time & language → Language & region → Add a language → Hebrew, and tick "Text-to-speech". Then refresh this page.',
+hintAndroid:'On Android: Settings → Accessibility → Text-to-speech output → gear icon → Install voice data → Hebrew.',
+hintIOS:'On iPhone: Settings → Accessibility → Spoken Content → Voices → Hebrew.',
+hintOther:'Install a {0} voice in your operating system, then refresh this page.',
 testHe:'שלום, זהו מבחן קול בעברית. אם אתה שומע את המשפט הזה, הכול עובד.',
 testEn:'Hello, this is an English voice test. If you can hear this, everything works.',
 dAudio:'Audio decoding', dSpeech:'Speech engine', dVoiceHe:'Hebrew voice', dVoiceEn:'English voice',
@@ -685,17 +700,24 @@ voices.filter(v => _f(v, 'he')).length, voices.filter(v => _f(v, 'en')).length)}
 }
 window.loadVoices = loadVoices;
 speechSynthesis.onvoiceschanged = loadVoices;
+const PLATFORM = /Android/i.test(navigator.userAgent) ? 'hintAndroid'
+: /iP(hone|ad|od)/.test(navigator.userAgent) ? 'hintIOS'
+: /Win/i.test(navigator.userAgent) ? 'hintWin' : 'hintOther';
+function voiceUnavailable(l) {
+say(stB, t('voiceHelp', LBL()[l], t(PLATFORM, LBL()[l])), 'warn');
+}
+function ttsFailed() {
+const has = voices.filter(v => _f(v, _13)).length;
+if (has) { say(stB, t('ttsFailDevice'), 'warn'); _e(_12, _13); }
+else voiceUnavailable(_13);
+}
 const _16 = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
 let _14 = null, _11 = [], _12 = '', _13 = 'he';
 function _a() {
 if (!_14) {
 _14 = new Audio(); _14.preload = 'auto';
 _14.onended = () => _c();
-_14.onerror = () => {
-const has = voices.filter(v => _f(v, _13)).length;
-say(stB, has ? t('ttsFailDevice') : t('ttsFailNet'), 'warn');
-if (has) _e(_12, _13);
-};
+_14.onerror = () => ttsFailed();
 }
 return _14;
 }
@@ -718,7 +740,7 @@ const n = _a();
 n.src = 'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob'
 + `&tl=${g(_13)}&q=` + encodeURIComponent(_11.shift());
 n.playbackRate = +rate.value;
-n.play().catch(e => say(stB, '⚠ ' + e.message, 'err'));
+n.play().catch(() => ttsFailed());
 }
 function _d(txt, l) { _12 = txt; _13 = l; _11 = _b(txt); _c(); }
 function _e(txt, l) {
@@ -742,9 +764,10 @@ if (!txt?.trim()) return;
 stopSpeak();
 const has = voices.filter(v => _f(v, l)).length;
 const mode = vsrc.value === 'auto' ? (has ? 'device' : 'online') : vsrc.value;
-if (mode === 'device' && has) _e(txt, l);
-else if (mode === 'device') say(stB, t('pickOnline', LBL()[l]), 'warn');
-else _d(txt, l);
+if (mode === 'device' && has) return _e(txt, l);
+if (mode === 'device') return say(stB, t('pickOnline', LBL()[l]), 'warn');
+if (!has) voiceUnavailable(l);
+_d(txt, l);
 };
 window.testVoice = () => {
 unlockAudio();
