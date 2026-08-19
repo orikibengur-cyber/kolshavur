@@ -24,9 +24,14 @@ body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);min-height:1
 header{display:flex;align-items:center;gap:10px;margin:6px 0 14px}
 header h1{font-size:19px;margin:0;font-weight:700;letter-spacing:-.2px}
 header .sub{font-size:12px;color:var(--dim);margin-top:2px}
+header .grow{flex:1}
 .logo{width:38px;height:38px;border-radius:11px;flex:0 0 auto;
   background:linear-gradient(135deg,var(--accent),var(--accent2));
   display:grid;place-items:center;font-size:19px}
+#lang{appearance:none;border:1px solid var(--line);background:var(--panel2);color:var(--txt);
+  font-family:inherit;font-size:13px;font-weight:700;padding:9px 13px;border-radius:10px;
+  cursor:pointer;flex:0 0 auto;white-space:nowrap}
+#lang:active{transform:scale(.96)}
 
 .tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--panel);
   padding:6px;border-radius:var(--r);border:1px solid var(--line);margin-bottom:14px}
@@ -90,12 +95,10 @@ details[open] summary::after{transform:rotate(180deg)}
 details .in{padding-bottom:16px}
 
 .pill{display:inline-block;font-size:11.5px;padding:4px 10px;border-radius:99px;
-  background:var(--panel2);border:1px solid var(--line);color:var(--dim);margin:0 0 0 5px}
+  background:var(--panel2);border:1px solid var(--line);color:var(--dim);margin:0 5px}
 .pill.ok{color:var(--accent2);border-color:rgba(56,211,159,.35)}
-.pill.bad{color:var(--warn);border-color:rgba(255,180,84,.35)}
 .hide{display:none!important}
 .note{font-size:12.5px;color:var(--dim);line-height:1.6;margin-top:10px}
-.note code{background:var(--panel2);padding:2px 6px;border-radius:5px;font-size:11.5px;direction:ltr;display:inline-block}
 footer{text-align:center;color:var(--dim);font-size:11.5px;margin-top:22px;line-height:1.7}
 </style>
 </head>
@@ -104,24 +107,24 @@ footer{text-align:center;color:var(--dim);font-size:11.5px;margin-top:22px;line-
 
 <header>
   <div class="logo">🎧</div>
-  <div>
-    <h1>קול־שבור</h1>
-    <div class="sub">הקלטה ← טקסט · טקסט ← קול · עברית ⇄ אנגלית</div>
+  <div class="grow">
+    <h1 data-t="appName">קול־שבור</h1>
+    <div class="sub" data-t="appSub"></div>
   </div>
+  <button id="lang" onclick="toggleLang()">English</button>
 </header>
 
 <div class="tabs">
-  <button id="tabA" class="on" onclick="setTab('A')">🔇 הקלטה ← קריאה<small>voice note → text</small></button>
-  <button id="tabB" onclick="setTab('B')">🔊 הודעה ← האזנה<small>text → speech</small></button>
+  <button id="tabA" class="on" onclick="setTab('A')"><span data-t="tabA"></span><small data-t="tabAsub"></small></button>
+  <button id="tabB" onclick="setTab('B')"><span data-t="tabB"></span><small data-t="tabBsub"></small></button>
 </div>
-
 
 <section id="paneA">
   <div class="card">
-    <h2>1 · בחר את קובץ ההקלטה</h2>
+    <h2 data-t="a1"></h2>
     <div class="drop" id="drop" onclick="fileIn.click()">
-      <b>הקש כדי לבחור הקלטה קולית</b>
-      שיתוף ההודעה הקולית ← "שמור בקבצים" ← בחירה כאן<br>
+      <b data-t="dropTitle"></b>
+      <span data-t="dropHint"></span><br>
       <span style="font-size:12.5px;opacity:.75">m4a · mp3 · ogg · opus · wav · caf · webm</span>
       <div id="fname" class="file" style="margin-top:9px"></div>
     </div>
@@ -130,173 +133,338 @@ footer{text-align:center;color:var(--dim);font-size:11.5px;margin-top:22px;line-
   </div>
 
   <div class="card">
-    <h2>2 · שפת התוצאה</h2>
-    <label class="fld">הצג את התוצאה ב</label>
+    <h2 data-t="a2"></h2>
+    <label class="fld" data-t="showResultIn"></label>
     <select id="aOut" onchange="syncA()">
-      <option value="he" selected>🇮🇱 עברית</option>
-      <option value="en">🇺🇸 אנגלית</option>
+      <option value="he">🇮🇱 <span></span></option>
+      <option value="en">🇺🇸 <span></span></option>
     </select>
-    <div class="note">ההקלטה חייבת להיות באנגלית. תמלול עברית הוסר — הדיוק היה נמוך מדי.</div>
-    <div class="note hide" id="iosTip"><b>באייפון:</b> לחיצה ארוכה על ההודעה הקולית ←
-      שיתוף ← "שמור בקבצים" ← ואז לבחור אותה כאן. אפל לא מאפשרת שיתוף ישיר לאפליקציות אינטרנט.</div>
-    <div class="note hide" id="shareTip"><b>קיצור דרך:</b> אפשר גם לשתף הודעה קולית
-      ישירות לקול־שבור מתפריט השיתוף של וואטסאפ.</div>
-    <button class="btn go" id="runA" onclick="goA()" disabled style="margin-top:14px">▶ תמלל לעברית</button>
+    <div class="note" data-t="englishOnly"></div>
+    <div class="note hide" id="iosTip" data-t="iosTip"></div>
+    <div class="note hide" id="shareTip" data-t="shareTip"></div>
+    <button class="btn go" id="runA" onclick="goA()" disabled style="margin-top:14px"></button>
     <div class="bar" id="barA"><i></i></div>
-    <div class="status" id="stA">בחר קובץ כדי להתחיל.</div>
+    <div class="status" id="stA"></div>
   </div>
 
   <div class="card">
-    <h2 id="outAHead">🇮🇱 עברית</h2>
+    <h2 id="outAHead"></h2>
     <div class="out" id="outA"></div>
     <div class="row" style="margin-top:11px">
-      <button class="btn sec sm" onclick="copy(outA.textContent)">📋 העתק</button>
-      <button class="btn sec sm" onclick="unlockAudio();speak(outA.textContent, aOut.value)">🔊 הקרא</button>
-      <button class="btn sec sm" onclick="stopSpeak()">⏹ עצור</button>
+      <button class="btn sec sm" onclick="copy(outA.textContent)" data-t="btnCopy"></button>
+      <button class="btn sec sm" onclick="unlockAudio();speak(outA.textContent, aOut.value)" data-t="btnSpeak"></button>
+      <button class="btn sec sm" onclick="stopSpeak()" data-t="btnStop"></button>
     </div>
   </div>
 
   <details>
-    <summary id="srcAHead">התמלול המקורי</summary>
+    <summary id="srcAHead"></summary>
     <div class="in"><div class="out src" id="srcA"></div></div>
   </details>
 </section>
 
-
 <section id="paneB" class="hide">
   <div class="card">
-    <h2>1 · הדבק את ההודעה</h2>
-    <textarea id="txtB" placeholder="Paste a message here…  /  הדבק כאן הודעה…" oninput="syncB()"></textarea>
+    <h2 data-t="b1"></h2>
+    <textarea id="txtB" oninput="syncB()"></textarea>
     <div class="row" style="margin-top:9px">
-      <button class="btn sec sm" onclick="pasteB()">📋 הדבק מהלוח</button>
-      <button class="btn sec sm" onclick="txtB.value='';syncB();outB.textContent=''">✕ נקה</button>
+      <button class="btn sec sm" onclick="pasteB()" data-t="btnPaste"></button>
+      <button class="btn sec sm" onclick="txtB.value='';syncB();outB.textContent=''" data-t="btnClear"></button>
     </div>
   </div>
 
   <div class="card">
-    <h2>2 · שפות והקראה</h2>
+    <h2 data-t="b2"></h2>
     <div class="pair">
       <div>
-        <label class="fld">שפת הטקסט</label>
+        <label class="fld" data-t="textLang"></label>
         <select id="bSrc" onchange="syncB()">
-          <option value="auto" selected>🌐 זהה אוטומטית</option>
-          <option value="en">🇺🇸 אנגלית</option>
-          <option value="he">🇮🇱 עברית</option>
+          <option value="auto">🌐 <span></span></option>
+          <option value="en">🇺🇸 <span></span></option>
+          <option value="he">🇮🇱 <span></span></option>
         </select>
       </div>
       <div>
-        <label class="fld">הקרא בשפה</label>
+        <label class="fld" data-t="speakIn"></label>
         <select id="bOut" onchange="syncB();loadVoices()">
-          <option value="he" selected>🇮🇱 עברית</option>
-          <option value="en">🇺🇸 אנגלית</option>
+          <option value="he">🇮🇱 <span></span></option>
+          <option value="en">🇺🇸 <span></span></option>
         </select>
       </div>
     </div>
-    <button class="btn go" id="runB" onclick="goB()" disabled style="margin-top:14px">🔊 תרגם והקרא בעברית</button>
-    <div class="status" id="stB">הדבק טקסט כדי להתחיל.</div>
+    <button class="btn go" id="runB" onclick="goB()" disabled style="margin-top:14px"></button>
+    <div class="status" id="stB"></div>
 
-    <label class="fld">מהירות הדיבור · <span id="rateV">1.0</span>×</label>
+    <label class="fld"><span data-t="speed"></span> · <span id="rateV">1.0</span>×</label>
     <input type="range" id="rate" min="0.6" max="1.8" step="0.1" value="1"
            oninput="rateV.textContent=(+this.value).toFixed(1)">
-    <label class="fld">מקור הקול</label>
+    <label class="fld" data-t="voiceSource"></label>
     <select id="vsrc">
-      <option value="auto" selected>אוטומטי — קול מקוון אם אין קול במכשיר</option>
-      <option value="online">מקוון (Google) — לא צריך התקנה</option>
-      <option value="device">קול המכשיר — עובד גם ללא אינטרנט</option>
+      <option value="auto"></option>
+      <option value="online"></option>
+      <option value="device"></option>
     </select>
-    <label class="fld">קול המכשיר</label>
+    <label class="fld" data-t="deviceVoice"></label>
     <select id="voice"></select>
     <div class="row" style="margin-top:11px">
-      <button class="btn sec sm" onclick="unlockAudio();speak(outB.textContent, bOut.value)">▶ שוב</button>
-      <button class="btn sec sm" onclick="stopSpeak()">⏹ עצור</button>
-      <button class="btn sec sm" onclick="testVoice()">🎤 בדוק קול</button>
+      <button class="btn sec sm" onclick="unlockAudio();speak(outB.textContent, bOut.value)" data-t="btnAgain"></button>
+      <button class="btn sec sm" onclick="stopSpeak()" data-t="btnStop"></button>
+      <button class="btn sec sm" onclick="testVoice()" data-t="btnTestVoice"></button>
     </div>
   </div>
 
   <div class="card">
-    <h2 id="outBHead">🇮🇱 עברית</h2>
+    <h2 id="outBHead"></h2>
     <div class="out" id="outB"></div>
   </div>
 </section>
 
-
 <details>
-  <summary>הגדרות ואבחון <span id="diag"></span></summary>
+  <summary><span data-t="settings"></span> <span id="diag"></span></summary>
   <div class="in">
-    <label class="fld">מודל תמלול (אנגלית · הורדה חד־פעמית, נשמר בדפדפן)</label>
+    <label class="fld" data-t="modelLabel"></label>
     <select id="model">
-      <option value="Xenova/whisper-tiny.en">Tiny — ~40MB · מהיר מאוד, דיוק בינוני</option>
-      <option value="Xenova/whisper-base.en" selected>Base — ~145MB · מומלץ לטלפון</option>
-      <option value="Xenova/whisper-small.en">Small — ~460MB · הכי מדויק, למחשב</option>
+      <option value="Xenova/whisper-tiny.en"></option>
+      <option value="Xenova/whisper-base.en" selected></option>
+      <option value="Xenova/whisper-small.en"></option>
     </select>
 
-    <label class="fld">מנוע תרגום</label>
+    <label class="fld" data-t="engineLabel"></label>
     <select id="engine">
-      <option value="auto" selected>אוטומטי — מנסה לפי הסדר</option>
-      <option value="builtin">מובנה בדפדפן (Chrome / Edge, לא מקוון)</option>
-      <option value="google">Google (חינם, ללא מפתח)</option>
-      <option value="mymemory">MyMemory (חינם, ללא מפתח)</option>
-      <option value="lingva">Lingva (חינם, ללא מפתח)</option>
+      <option value="auto"></option>
+      <option value="builtin"></option>
+      <option value="google">Google</option>
+      <option value="mymemory">MyMemory</option>
+      <option value="lingva">Lingva</option>
     </select>
 
     <div class="note" id="caps"></div>
     <div class="row" style="margin-top:11px">
-      <button class="btn sec sm" onclick="runDiag()">🔍 בדוק מערכת</button>
-      <button class="btn sec sm" onclick="preload()">⬇ הורד מודל מראש</button>
+      <button class="btn sec sm" onclick="runDiag()" data-t="btnCheck"></button>
+      <button class="btn sec sm" onclick="preload()" data-t="btnPreload"></button>
     </div>
     <div class="status" id="stD"></div>
-    <div class="note">
-      התמלול מיועד להקלטות באנגלית בלבד. אם הדיוק נמוך, נסה מודל גדול יותר.
-    </div>
+    <div class="note" data-t="modelNote"></div>
   </div>
 </details>
 
-<footer>
-  הכול רץ בדפדפן שלך · ללא מפתחות API · ללא הרשמה<br>
-  ההקלטות לא נשמרות בשום שרת — התמלול מתבצע במכשיר עצמו
-</footer>
+<footer data-t="footer"></footer>
 </div>
 
 <script type="module">
 const $ = id => document.getElementById(id);
 ['fileIn','fname','player','runA','barA','stA','outA','srcA','drop','aOut',
 'outAHead','srcAHead','txtB','runB','stB','outB','outBHead','bSrc','bOut',
-'rate','rateV','voice','vsrc','model','engine','stD','caps','diag',
+'rate','rateV','voice','vsrc','model','engine','stD','caps','diag','lang',
 'tabA','tabB','paneA','paneB','iosTip','shareTip'].forEach(i => window[i] = $(i));
-const _17 = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.1';
-const LBL  = { he: 'עברית',  en: 'אנגלית' };
-const FLAG = { he: '🇮🇱',     en: '🇺🇸' };
-let asr = null, _15 = null, busy = false;
-const say = (el, msg, cls = '') => { el.textContent = msg; el.className = 'status ' + cls; };
+const T = {
+he:{
+appName:'קול־שבור', appSub:'הקלטה ← טקסט · טקסט ← קול · עברית ⇄ אנגלית',
+tabA:'🔇 הקלטה ← קריאה', tabAsub:'voice note → text',
+tabB:'🔊 הודעה ← האזנה', tabBsub:'text → speech',
+a1:'1 · בחר את קובץ ההקלטה', a2:'2 · שפת התוצאה',
+dropTitle:'הקש כדי לבחור הקלטה קולית',
+dropHint:'שיתוף ההודעה הקולית ← "שמור בקבצים" ← בחירה כאן',
+showResultIn:'הצג את התוצאה ב',
+englishOnly:'ההקלטה חייבת להיות באנגלית. תמלול עברית הוסר — הדיוק היה נמוך מדי.',
+iosTip:'<b>באייפון:</b> לחיצה ארוכה על ההודעה הקולית ← שיתוף ← "שמור בקבצים" ← ואז לבחור אותה כאן. אפל לא מאפשרת שיתוף ישיר לאפליקציות אינטרנט.',
+shareTip:'<b>קיצור דרך:</b> אפשר לשתף הודעה קולית ישירות לקול־שבור מתפריט השיתוף של וואטסאפ.',
+b1:'1 · הדבק את ההודעה', b2:'2 · שפות והקראה',
+placeholder:'הדבק כאן הודעה…',
+textLang:'שפת הטקסט', speakIn:'הקרא בשפה', speed:'מהירות הדיבור',
+voiceSource:'מקור הקול', deviceVoice:'קול המכשיר',
+vsrcAuto:'אוטומטי — קול מקוון אם אין קול במכשיר',
+vsrcOnline:'מקוון (Google) — לא צריך התקנה',
+vsrcDevice:'קול המכשיר — עובד גם ללא אינטרנט',
+btnCopy:'📋 העתק', btnSpeak:'🔊 הקרא', btnStop:'⏹ עצור', btnAgain:'▶ שוב',
+btnPaste:'📋 הדבק מהלוח', btnClear:'✕ נקה', btnTestVoice:'🎤 בדוק קול',
+btnCheck:'🔍 בדוק מערכת', btnPreload:'⬇ הורד מודל מראש',
+settings:'הגדרות ואבחון',
+modelLabel:'מודל תמלול (אנגלית · הורדה חד־פעמית, נשמר בדפדפן)',
+mTiny:'Tiny — ~40MB · מהיר מאוד, דיוק בינוני',
+mBase:'Base — ~145MB · מומלץ לטלפון',
+mSmall:'Small — ~460MB · הכי מדויק, למחשב',
+engineLabel:'מנוע תרגום', engAuto:'אוטומטי — מנסה לפי הסדר',
+engBuiltin:'מובנה בדפדפן (Chrome / Edge, לא מקוון)',
+modelNote:'התמלול מיועד להקלטות באנגלית בלבד. אם הדיוק נמוך, נסה מודל גדול יותר.',
+footer:'הכול רץ בדפדפן שלך · ללא מפתחות API · ללא הרשמה<br>ההקלטות לא נשמרות בשום שרת — התמלול מתבצע במכשיר עצמו',
+srcHead:'התמלול המקורי (אנגלית)',
+he:'עברית', en:'אנגלית', auto:'זהה אוטומטית',
+transcribeTo:'▶ תמלל ל{0}', translateSpeak:'🔊 תרגם והקרא ב{0}',
+pickFile:'בחר קובץ כדי להתחיל.', ready:'מוכן לתמלול.',
+pasteToStart:'הדבק טקסט כדי להתחיל.',
+decoding:'מפענח את קובץ השמע…',
+decodeFail:'הדפדפן לא הצליח לפענח את הקובץ. נסה לשמור אותו כ-m4a או mp3. ({0})',
+tooShort:'הקובץ ריק או קצר מדי.',
+loadingModel:'טוען מודל תמלול…',
+downloading:'מוריד מודל {0}% {1}',
+transcribing:'מתמלל {0} שניות של אנגלית…',
+noSpeech:'לא זוהה דיבור בהקלטה.',
+translatingVia:'מתרגם {0}→{1} דרך {2}…',
+allEnginesFailed:'כל מנועי התרגום נכשלו — {0}',
+noTranslation:'ללא תרגום',
+doneNoTr:'✓ הושלם ב-{0} שניות · תמלול {1} ללא תרגום',
+doneTr:'✓ הושלם ב-{0} שניות · {1}→{2} · {3}',
+copied:'✓ הועתק ללוח', copyFail:'ההעתקה נכשלה — סמן ידנית',
+pasted:'✓ הודבק מהלוח', clipEmpty:'הלוח ריק.', clipNo:'אין גישה ללוח — הדבק ידנית.',
+speakingNoTr:'✓ {0} · ללא תרגום · מקריא…', speakingTr:'✓ {0}→{1} · {2} · מקריא…',
+sharedAudio:'התקבלה הקלטה משיתוף — מתחיל…', sharedText:'התקבל טקסט משיתוף.',
+noVoiceInstalled:'— אין קול {0} מותקן —', voicesPill:'קולות: {0} עב · {1} אנ',
+pickOnline:'⚠ אין קול {0} מותקן — בחר "מקוון".',
+ttsFailDevice:'⚠ הקול המקוון נכשל — עובר לקול המכשיר.',
+ttsFailNet:'⚠ הקול המקוון נכשל. בדוק חיבור לאינטרנט.',
+testHe:'שלום, זהו מבחן קול בעברית. אם אתה שומע את המשפט הזה, הכול עובד.',
+testEn:'Hello, this is an English voice test. If you can hear this, everything works.',
+dAudio:'פענוח שמע', dSpeech:'מנוע דיבור', dVoiceHe:'קול עברי', dVoiceEn:'קול אנגלי',
+dNoVoice:'אין קול {0} — ישתמש בקול מקוון',
+dGpu:'WebGPU — תמלול מהיר', dNoGpu:'ללא WebGPU — תמלול איטי יותר (WASM)',
+dTrBuiltin:'תרגום מובנה בדפדפן', dNoTrBuiltin:'אין תרגום מובנה — נשתמש בשירות חינמי',
+dClip:'קריאת לוח', dNoClip:'אין קריאת לוח',
+dCache:'המודל נשמר — הורדה חד־פעמית בלבד',
+dNoCache:'המודל לא נשמר ({0}) — יירד מחדש בכל פתיחה.',
+dTapCheck:'הקש "בדוק מערכת" לבדיקת תרגום חיה.',
+dChecking:'בודק תרגום בשני הכיוונים…', dDone:'הבדיקה הושלמה.',
+dTrOk:'{0}→{1} ({2}) → {3}', dTrFail:'{0}→{1} נכשל: {2}',
+preloading:'מוריד מודל…', preloadPct:'מוריד {0}% {1}',
+preloadOk:'✓ המודל מוכן ושמור. מעכשיו התמלול יתחיל מיד.',
+},
+en:{
+appName:'Voice Bridge', appSub:'voice note → text · text → speech · Hebrew ⇄ English',
+tabA:'🔇 Listen → Read', tabAsub:'voice note → text',
+tabB:'🔊 Read → Listen', tabBsub:'text → speech',
+a1:'1 · Choose the recording', a2:'2 · Output language',
+dropTitle:'Tap to choose a voice note',
+dropHint:'Share the voice note → "Save to Files" → pick it here',
+showResultIn:'Show the result in',
+englishOnly:'The recording must be in English. Hebrew transcription was removed — accuracy was too low.',
+iosTip:'<b>On iPhone:</b> long-press the voice note → Share → "Save to Files" → then pick it here. Apple does not allow sharing directly to web apps.',
+shareTip:'<b>Shortcut:</b> you can share a voice note straight to Voice Bridge from WhatsApp\'s share menu.',
+b1:'1 · Paste the message', b2:'2 · Languages & playback',
+placeholder:'Paste a message here…',
+textLang:'Text language', speakIn:'Speak in', speed:'Speech rate',
+voiceSource:'Voice source', deviceVoice:'Device voice',
+vsrcAuto:'Automatic — online voice if none installed',
+vsrcOnline:'Online (Google) — nothing to install',
+vsrcDevice:'Device voice — works offline',
+btnCopy:'📋 Copy', btnSpeak:'🔊 Read aloud', btnStop:'⏹ Stop', btnAgain:'▶ Again',
+btnPaste:'📋 Paste', btnClear:'✕ Clear', btnTestVoice:'🎤 Test voice',
+btnCheck:'🔍 Check system', btnPreload:'⬇ Download model now',
+settings:'Settings & diagnostics',
+modelLabel:'Transcription model (English · one-time download, kept in the browser)',
+mTiny:'Tiny — ~40MB · very fast, moderate accuracy',
+mBase:'Base — ~145MB · recommended for phones',
+mSmall:'Small — ~460MB · most accurate, for desktop',
+engineLabel:'Translation engine', engAuto:'Automatic — tries in order',
+engBuiltin:'Built into the browser (Chrome / Edge, offline)',
+modelNote:'Transcription is for English recordings only. If accuracy is poor, try a larger model.',
+footer:'Everything runs in your browser · No API keys · No sign-up<br>Recordings are never uploaded — transcription happens on your device',
+srcHead:'Original transcript (English)',
+he:'Hebrew', en:'English', auto:'Detect automatically',
+transcribeTo:'▶ Transcribe to {0}', translateSpeak:'🔊 Translate & read in {0}',
+pickFile:'Choose a file to begin.', ready:'Ready to transcribe.',
+pasteToStart:'Paste some text to begin.',
+decoding:'Decoding the audio file…',
+decodeFail:'The browser could not decode this file. Try saving it as m4a or mp3. ({0})',
+tooShort:'The file is empty or too short.',
+loadingModel:'Loading transcription model…',
+downloading:'Downloading model {0}% {1}',
+transcribing:'Transcribing {0} seconds of English…',
+noSpeech:'No speech detected in the recording.',
+translatingVia:'Translating {0}→{1} via {2}…',
+allEnginesFailed:'All translation engines failed — {0}',
+noTranslation:'no translation needed',
+doneNoTr:'✓ Done in {0}s · {1} transcript, no translation',
+doneTr:'✓ Done in {0}s · {1}→{2} · {3}',
+copied:'✓ Copied to clipboard', copyFail:'Copy failed — select it manually',
+pasted:'✓ Pasted from clipboard', clipEmpty:'Clipboard is empty.', clipNo:'No clipboard access — paste manually.',
+speakingNoTr:'✓ {0} · no translation · reading…', speakingTr:'✓ {0}→{1} · {2} · reading…',
+sharedAudio:'Recording received from share — starting…', sharedText:'Text received from share.',
+noVoiceInstalled:'— no {0} voice installed —', voicesPill:'voices: {0} he · {1} en',
+pickOnline:'⚠ No {0} voice installed — choose "Online".',
+ttsFailDevice:'⚠ Online voice failed — switching to the device voice.',
+ttsFailNet:'⚠ Online voice failed. Check your connection.',
+testHe:'שלום, זהו מבחן קול בעברית. אם אתה שומע את המשפט הזה, הכול עובד.',
+testEn:'Hello, this is an English voice test. If you can hear this, everything works.',
+dAudio:'Audio decoding', dSpeech:'Speech engine', dVoiceHe:'Hebrew voice', dVoiceEn:'English voice',
+dNoVoice:'No {0} voice — will use the online voice',
+dGpu:'WebGPU — fast transcription', dNoGpu:'No WebGPU — slower transcription (WASM)',
+dTrBuiltin:'Browser built-in translation', dNoTrBuiltin:'No built-in translation — using a free service',
+dClip:'Clipboard read', dNoClip:'No clipboard read',
+dCache:'Model is cached — downloads only once',
+dNoCache:'Model is not cached ({0}) — it will re-download every time.',
+dTapCheck:'Tap "Check system" for a live translation test.',
+dChecking:'Testing translation both ways…', dDone:'Check complete.',
+dTrOk:'{0}→{1} ({2}) → {3}', dTrFail:'{0}→{1} failed: {2}',
+preloading:'Downloading model…', preloadPct:'Downloading {0}% {1}',
+preloadOk:'✓ Model ready and cached. Transcription starts instantly from now on.',
+}};
+let LANG = localStorage.getItem('vb-lang')
+|| ((navigator.language || '').startsWith('he') ? 'he' : 'en');
+const t = (k, ...a) => {
+let s = T[LANG][k] ?? T.he[k] ?? k;
+a.forEach((v, i) => { s = s.split('{' + i + '}').join(v ?? ''); });
+return s;
+};
+const LBL = () => ({ he: t('he'), en: t('en') });
+const FLAG = { he: '🇮🇱', en: '🇺🇸' };
+function applyLang() {
+const he = LANG === 'he';
+document.documentElement.lang = he ? 'he' : 'en';
+document.documentElement.dir = he ? 'rtl' : 'ltr';
+lang.textContent = he ? 'English' : 'עברית';
+document.querySelectorAll('[data-t]').forEach(el => { el.innerHTML = t(el.dataset.t); });
+txtB.placeholder = t('placeholder');
+const set = (sel, vals) => [...sel.options].forEach((o, i) => {
+const flag = o.textContent.match(/^[\u{1F1E6}-\u{1F1FF}\u{1F310}]{1,2}/u);
+o.textContent = (flag ? flag[0] + ' ' : '') + vals[i];
+});
+set(aOut, [t('he'), t('en')]);
+set(bSrc, [t('auto'), t('en'), t('he')]);
+set(bOut, [t('he'), t('en')]);
+set(vsrc, [t('vsrcAuto'), t('vsrcOnline'), t('vsrcDevice')]);
+set(model, [t('mTiny'), t('mBase'), t('mSmall')]);
+set(engine, [t('engAuto'), t('engBuiltin'), 'Google', 'MyMemory', 'Lingva']);
+srcAHead.textContent = t('srcHead');
+if (!stA.textContent || stA.dataset.k) { stA.dataset.k = 'pickFile'; say(stA, t('pickFile')); }
+if (!stB.textContent || stB.dataset.k) { stB.dataset.k = 'pasteToStart'; say(stB, t('pasteToStart')); }
+syncA(); syncB(); loadVoices();
+document.title = LANG === 'he' ? 'קול־שבור · Voice Bridge' : 'Voice Bridge · קול־שבור';
+}
+window.toggleLang = () => {
+LANG = LANG === 'he' ? 'en' : 'he';
+localStorage.setItem('vb-lang', LANG);
+applyLang();
+};
+const say = (el, msg, cls = '') => { el.innerHTML = msg; el.className = 'status ' + cls; };
 const prog = (bar, pct) => {
 bar.classList.toggle('on', pct != null);
 if (pct != null) bar.firstElementChild.style.width = Math.max(2, Math.min(100, pct)) + '%';
 };
-const detect = t => /[֐-׿]/.test(t || '') ? 'he' : 'en';
-const setOut = (el, text, lang) => {
+const detect = s => /[֐-׿]/.test(s || '') ? 'he' : 'en';
+const setOut = (el, text, l) => {
 el.textContent = text;
-el.style.direction = lang === 'he' ? 'rtl' : 'ltr';
-el.style.textAlign = lang === 'he' ? 'right' : 'left';
+el.style.direction = l === 'he' ? 'rtl' : 'ltr';
+el.style.textAlign = l === 'he' ? 'right' : 'left';
 };
 window.copy = async txt => {
 if (!txt) return;
-try { await navigator.clipboard.writeText(txt); say(stA, '✓ הועתק ללוח', 'ok'); }
-catch { say(stA, 'ההעתקה נכשלה — סמן ידנית', 'warn'); }
+try { await navigator.clipboard.writeText(txt); say(stA, t('copied'), 'ok'); }
+catch { say(stA, t('copyFail'), 'warn'); }
 };
-window.setTab = t => {
-const a = t === 'A';
+window.setTab = x => {
+const a = x === 'A';
 tabA.classList.toggle('on', a); tabB.classList.toggle('on', !a);
 paneA.classList.toggle('hide', !a); paneB.classList.toggle('hide', a);
 if (!a) setTimeout(() => { if (!txtB.value) pasteB(true); }, 120);
 };
 window.syncA = () => {
-runA.textContent = `▶ תמלל ל${LBL[aOut.value]}`;
-outAHead.textContent = `${FLAG[aOut.value]} ${LBL[aOut.value]}`;
+runA.textContent = t('transcribeTo', LBL()[aOut.value]);
+outAHead.textContent = FLAG[aOut.value] + ' ' + LBL()[aOut.value];
 };
 window.syncB = () => {
 runB.disabled = !txtB.value.trim();
-runB.textContent = `🔊 תרגם והקרא ב${LBL[bOut.value]}`;
-outBHead.textContent = `${FLAG[bOut.value]} ${LBL[bOut.value]}`;
+runB.textContent = t('translateSpeak', LBL()[bOut.value]);
+outBHead.textContent = FLAG[bOut.value] + ' ' + LBL()[bOut.value];
 const d = detect(txtB.value);
 txtB.style.direction = d === 'he' ? 'rtl' : 'ltr';
 txtB.style.textAlign = d === 'he' ? 'right' : 'left';
@@ -318,9 +486,8 @@ return out;
 }
 async function fx(url, ms = 10000) {
 const c = new AbortController();
-const t = setTimeout(() => c.abort(), ms);
-try { return await fetch(url, { signal: c.signal }); }
-finally { clearTimeout(t); }
+const id = setTimeout(() => c.abort(), ms);
+try { return await fetch(url, { signal: c.signal }); } finally { clearTimeout(id); }
 }
 const _4 = {};
 async function _0(text, from, to) {
@@ -328,7 +495,7 @@ if (typeof Translator === 'undefined') throw new Error('no built-in Translator')
 const k = from + '>' + to;
 if (!_4[k]) {
 const av = await Translator.availability({ sourceLanguage: from, targetLanguage: to });
-if (av === 'unavailable') throw new Error(`built-in lacks ${k}`);
+if (av === 'unavailable') throw new Error('built-in lacks ' + k);
 _4[k] = await Translator.create({ sourceLanguage: from, targetLanguage: to });
 }
 return await _4[k].translate(text);
@@ -347,12 +514,11 @@ return out.join('');
 async function _2(text, from, to) {
 const out = [];
 for (const c of chunk(text, 420)) {
-const r = await fx(`https://api.mymemory.translated.net/get?langpair=${from}|${to}&q=`
-+ encodeURIComponent(c));
+const r = await fx(`https://api.mymemory.translated.net/get?langpair=${from}|${to}&q=` + encodeURIComponent(c));
 if (!r.ok) throw new Error('mymemory ' + r.status);
-const t = (await r.json())?.responseData?.translatedText;
-if (!t || /MYMEMORY WARNING|QUERY LENGTH LIMIT/i.test(t)) throw new Error('mymemory quota');
-out.push(t);
+const x = (await r.json())?.responseData?.translatedText;
+if (!x || /MYMEMORY WARNING|QUERY LENGTH LIMIT/i.test(x)) throw new Error('mymemory quota');
+out.push(x);
 }
 return out.join(' ');
 }
@@ -371,25 +537,28 @@ return out.join(' ');
 throw last || new Error('lingva down');
 }
 const _5 = { builtin: _0, google: _1, mymemory: _2, lingva: _3 };
-const _6 = { builtin: 'מובנה בדפדפן', google: 'Google', mymemory: 'MyMemory', lingva: 'Lingva' };
+const ENAME = { builtin: () => t('engBuiltin').split(' (')[0], google: () => 'Google',
+mymemory: () => 'MyMemory', lingva: () => 'Lingva' };
 async function translate(text, from, to, onStep = () => {}) {
 if (!text?.trim()) return { text: '', via: '—' };
-if (from === to) return { text: text.trim(), via: 'ללא תרגום' };
+if (from === to) return { text: text.trim(), via: t('noTranslation') };
 const pick = engine.value;
 const order = pick === 'auto' ? ['builtin', 'google', 'lingva', 'mymemory'] : [pick];
 const errs = [];
 for (const k of order) {
 try {
-onStep(`מתרגם ${LBL[from]}→${LBL[to]} דרך ${_6[k]}…`);
-const t = await _5[k](text, from, to);
-if (t?.trim()) return { text: t.trim(), via: _6[k] };
-} catch (e) { errs.push(`${k}: ${e.message}`); }
+onStep(t('translatingVia', LBL()[from], LBL()[to], ENAME[k]()));
+const x = await _5[k](text, from, to);
+if (x?.trim()) return { text: x.trim(), via: ENAME[k]() };
+} catch (e) { errs.push(k + ': ' + e.message); }
 }
-throw new Error('כל מנועי התרגום נכשלו — ' + errs.join(' · '));
+throw new Error(t('allEnginesFailed', errs.join(' · ')));
 }
+const CDN = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.1';
+let asr = null, _15 = null, busy = false;
 async function _7(onProg) {
 if (asr && _15 === model.value) return asr;
-const { pipeline, env } = await import( _17);
+const { pipeline, env } = await import( CDN);
 env.allowLocalModels = false;
 let dev;
 try { dev = (navigator.gpu && await navigator.gpu.requestAdapter()) ? 'webgpu' : 'wasm'; }
@@ -432,10 +601,8 @@ out[i] = d[i0] * (1 - f) + d[i1] * f;
 return out;
 }
 fileIn.onchange = e => _9(e.target.files[0]);
-['dragover','dragenter'].forEach(ev =>
-drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('hot'); }));
-['dragleave','drop'].forEach(ev =>
-drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('hot'); }));
+['dragover','dragenter'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('hot'); }));
+['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('hot'); }));
 drop.addEventListener('drop', e => { if (e.dataTransfer.files[0]) _9(e.dataTransfer.files[0]); });
 function _9(f) {
 if (!f) return;
@@ -443,100 +610,90 @@ fname.textContent = `${f.name} · ${(f.size / 1024).toFixed(0)} KB`;
 player.src = URL.createObjectURL(f);
 player.classList.remove('hide');
 runA.disabled = false;
-say(stA, 'מוכן לתמלול.', 'ok');
+delete stA.dataset.k; say(stA, t('ready'), 'ok');
 window._file = f;
 }
 window.goA = async () => {
 if (busy || !window._file) return;
 busy = true; runA.disabled = true; outA.textContent = ''; srcA.textContent = '';
+delete stA.dataset.k;
 try {
-say(stA, 'מפענח את קובץ השמע…'); prog(barA, 3);
+say(stA, t('decoding')); prog(barA, 3);
 let pcm;
 try { pcm = await decode(window._file); }
-catch (e) { throw new Error('הדפדפן לא הצליח לפענח את הקובץ. נסה לשמור אותו כ-m4a או mp3. (' + e.message + ')'); }
+catch (e) { throw new Error(t('decodeFail', e.message)); }
 const secs = pcm.length / 16000;
-if (secs < 0.2) throw new Error('הקובץ ריק או קצר מדי.');
-say(stA, 'טוען מודל תמלול…');
+if (secs < 0.2) throw new Error(t('tooShort'));
+say(stA, t('loadingModel'));
 const pipe = await _7((pct, file) => {
 prog(barA, pct);
-say(stA, `מוריד מודל ${Math.round(pct)}% ${file ? '· ' + file : ''}`);
+say(stA, t('downloading', Math.round(pct), file ? '· ' + file : ''));
 });
 prog(barA, null);
-say(stA, `מתמלל ${secs.toFixed(0)} שניות של אנגלית…`);
+say(stA, t('transcribing', secs.toFixed(0)));
 const opts = {};
 if (secs > 28) { opts.chunk_length_s = 30; opts.stride_length_s = 5; }
 const t0 = performance.now();
 const res = await pipe(pcm, opts);
 const raw = (res.text || '').trim();
-if (!raw) throw new Error('לא זוהה דיבור בהקלטה.');
-const from = 'en';
-const to = aOut.value;
-srcAHead.textContent = 'התמלול המקורי (אנגלית)';
-setOut(srcA, raw, from);
+if (!raw) throw new Error(t('noSpeech'));
+const from = 'en', to = aOut.value;
+setOut(srcA, raw, 'en');
 const { text: final, via } = await translate(raw, from, to, m => say(stA, m));
 setOut(outA, final, to);
-const secsTaken = ((performance.now() - t0) / 1000).toFixed(1);
-say(stA, from === to
-? `✓ הושלם ב-${secsTaken} שניות · תמלול ${LBL[from]} ללא תרגום`
-: `✓ הושלם ב-${secsTaken} שניות · ${LBL[from]}→${LBL[to]} · ${via}`, 'ok');
-} catch (e) {
-say(stA, '⚠ ' + e.message, 'err'); prog(barA, null);
-}
+const el = ((performance.now() - t0) / 1000).toFixed(1);
+say(stA, from === to ? t('doneNoTr', el, LBL()[from])
+: t('doneTr', el, LBL()[from], LBL()[to], via), 'ok');
+} catch (e) { say(stA, '⚠ ' + e.message, 'err'); prog(barA, null); }
 busy = false; runA.disabled = false;
 };
 window.pasteB = async quiet => {
 try {
-const t = await navigator.clipboard.readText();
-if (t?.trim()) { txtB.value = t.trim(); syncB(); say(stB, '✓ הודבק מהלוח', 'ok'); }
-else if (!quiet) say(stB, 'הלוח ריק.', 'warn');
-} catch { if (!quiet) say(stB, 'אין גישה ללוח — הדבק ידנית.', 'warn'); }
+const x = await navigator.clipboard.readText();
+if (x?.trim()) { txtB.value = x.trim(); syncB(); delete stB.dataset.k; say(stB, t('pasted'), 'ok'); }
+else if (!quiet) say(stB, t('clipEmpty'), 'warn');
+} catch { if (!quiet) say(stB, t('clipNo'), 'warn'); }
 };
 window.goB = async () => {
 if (busy) return;
 const src = txtB.value.trim(); if (!src) return;
-busy = true; runB.disabled = true;
+busy = true; runB.disabled = true; delete stB.dataset.k;
 unlockAudio();
 try {
-const from = bSrc.value === 'auto' ? detect(src) : bSrc.value;
-const to = bOut.value;
+const from = bSrc.value === 'auto' ? detect(src) : bSrc.value, to = bOut.value;
 const { text: final, via } = await translate(src, from, to, m => say(stB, m));
 setOut(outB, final, to);
-say(stB, from === to
-? `✓ ${LBL[to]} · ללא תרגום · מקריא…`
-: `✓ ${LBL[from]}→${LBL[to]} · ${via} · מקריא…`, 'ok');
+say(stB, from === to ? t('speakingNoTr', LBL()[to])
+: t('speakingTr', LBL()[from], LBL()[to], via), 'ok');
 speak(final, to);
 } catch (e) { say(stB, '⚠ ' + e.message, 'err'); }
 busy = false; runB.disabled = false;
 };
-let voices = [], _10 = [];
-const _f = (v, lang) => lang === 'he'
+let voices = [];
+const _f = (v, l) => l === 'he'
 ? (/^(he|iw)([-_]|$)/i.test(v.lang || '') || /carmit|hebrew|עברית/i.test(v.name || ''))
 : /^en([-_]|$)/i.test(v.lang || '');
 function loadVoices() {
 voices = speechSynthesis.getVoices();
 const want = bOut ? bOut.value : 'he';
-_10 = voices.filter(v => _f(v, want));
-voice.innerHTML = _10.length
-? _10.map(v => `<option value="${voices.indexOf(v)}">${v.name} (${v.lang})</option>`).join('')
-: `<option value="-1">— אין קול ${LBL[want]} מותקן —</option>`;
-const he = voices.filter(v => _f(v, 'he')).length;
-const en = voices.filter(v => _f(v, 'en')).length;
-diag.innerHTML = `<span class="pill ok">קולות: ${he} עב · ${en} אנ</span>`;
+const pool = voices.filter(v => _f(v, want));
+voice.innerHTML = pool.length
+? pool.map(v => `<option value="${voices.indexOf(v)}">${v.name} (${v.lang})</option>`).join('')
+: `<option value="-1">${t('noVoiceInstalled', LBL()[want])}</option>`;
+diag.innerHTML = `<span class="pill ok">${t('voicesPill',
+voices.filter(v => _f(v, 'he')).length, voices.filter(v => _f(v, 'en')).length)}</span>`;
 }
 window.loadVoices = loadVoices;
 speechSynthesis.onvoiceschanged = loadVoices;
-loadVoices(); setTimeout(loadVoices, 400); setTimeout(loadVoices, 1500);
 const _16 = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
 let _14 = null, _11 = [], _12 = '', _13 = 'he';
 function _a() {
 if (!_14) {
-_14 = new Audio();
-_14.preload = 'auto';
+_14 = new Audio(); _14.preload = 'auto';
 _14.onended = () => _c();
 _14.onerror = () => {
 const has = voices.filter(v => _f(v, _13)).length;
-say(stB, has ? '⚠ הקול המקוון נכשל — עובר לקול המכשיר.'
-: '⚠ הקול המקוון נכשל. בדוק חיבור לאינטרנט.', 'warn');
+say(stB, has ? t('ttsFailDevice') : t('ttsFailNet'), 'warn');
 if (has) _e(_12, _13);
 };
 }
@@ -563,77 +720,74 @@ n.src = 'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob'
 n.playbackRate = +rate.value;
 n.play().catch(e => say(stB, '⚠ ' + e.message, 'err'));
 }
-function _d(txt, lang) {
-_12 = txt; _13 = lang; _11 = _b(txt); _c();
-}
-function _e(txt, lang) {
-const pool = voices.filter(v => _f(v, lang));
+function _d(txt, l) { _12 = txt; _13 = l; _11 = _b(txt); _c(); }
+function _e(txt, l) {
+const pool = voices.filter(v => _f(v, l));
 const sel = voices[+voice.value];
-const use = (sel && _f(sel, lang)) ? sel : pool[0];
+const use = (sel && _f(sel, l)) ? sel : pool[0];
 (txt.match(/[^.!?\n]+[.!?]*/g) || [txt]).filter(p => p.trim()).forEach(p => {
 const u = new SpeechSynthesisUtterance(p.trim());
-u.lang = lang === 'he' ? 'he-IL' : 'en-US';
+u.lang = l === 'he' ? 'he-IL' : 'en-US';
 if (use) u.voice = use;
 u.rate = +rate.value; u.pitch = 1;
 speechSynthesis.speak(u);
 });
 }
 window.stopSpeak = () => {
-speechSynthesis.cancel();
-_11 = [];
+speechSynthesis.cancel(); _11 = [];
 if (_14) { try { _14.pause(); } catch {} }
 };
-window.speak = (txt, lang = 'he') => {
+window.speak = (txt, l = 'he') => {
 if (!txt?.trim()) return;
 stopSpeak();
-const has = voices.filter(v => _f(v, lang)).length;
+const has = voices.filter(v => _f(v, l)).length;
 const mode = vsrc.value === 'auto' ? (has ? 'device' : 'online') : vsrc.value;
-if (mode === 'device' && has) _e(txt, lang);
-else if (mode === 'device') say(stB, `⚠ אין קול ${LBL[lang]} מותקן — בחר "מקוון".`, 'warn');
-else _d(txt, lang);
+if (mode === 'device' && has) _e(txt, l);
+else if (mode === 'device') say(stB, t('pickOnline', LBL()[l]), 'warn');
+else _d(txt, l);
 };
 window.testVoice = () => {
 unlockAudio();
 const l = bOut.value;
-speak(l === 'he' ? 'שלום, זהו מבחן קול בעברית. אם אתה שומע את המשפט הזה, הכול עובד.'
-: 'Hello, this is an English voice test. If you can hear this, everything works.', l);
+speak(l === 'he' ? t('testHe') : t('testEn'), l);
 };
 window.runDiag = async (full = true) => {
 const L = [];
-L.push((window.AudioContext || window.webkitAudioContext) ? '✅ פענוח שמע' : '❌ פענוח שמע');
-L.push(window.speechSynthesis ? '✅ מנוע דיבור' : '❌ מנוע דיבור');
+L.push(((window.AudioContext || window.webkitAudioContext) ? '✅ ' : '❌ ') + t('dAudio'));
+L.push((window.speechSynthesis ? '✅ ' : '❌ ') + t('dSpeech'));
 loadVoices();
 const hv = voices.filter(v => _f(v, 'he')), ev = voices.filter(v => _f(v, 'en'));
-L.push(hv.length ? `✅ קול עברי (${hv[0].name})` : 'ℹ️ אין קול עברי — ישתמש בקול מקוון');
-L.push(ev.length ? `✅ קול אנגלי (${ev[0].name})` : 'ℹ️ אין קול אנגלי — ישתמש בקול מקוון');
+L.push(hv.length ? `✅ ${t('dVoiceHe')} (${hv[0].name})` : 'ℹ️ ' + t('dNoVoice', t('he')));
+L.push(ev.length ? `✅ ${t('dVoiceEn')} (${ev[0].name})` : 'ℹ️ ' + t('dNoVoice', t('en')));
 let gpu = false; try { gpu = !!(navigator.gpu && await navigator.gpu.requestAdapter()); } catch {}
-L.push(gpu ? '✅ WebGPU — תמלול מהיר' : '⚠️ ללא WebGPU — תמלול איטי יותר (WASM)');
-L.push(typeof Translator !== 'undefined' ? '✅ תרגום מובנה בדפדפן' : '⚠️ אין תרגום מובנה — נשתמש בשירות חינמי');
-L.push(navigator.clipboard?.readText ? '✅ קריאת לוח' : '⚠️ אין קריאת לוח');
-let cacheOK = false;
-try { cacheOK = !!(window.caches && await caches.open('kv-probe')); } catch {}
-L.push(cacheOK && /^https?:$/.test(location.protocol)
-? '✅ המודל נשמר — הורדה חד־פעמית בלבד'
-: `⚠️ המודל לא נשמר (${location.protocol}) — יירד מחדש בכל פתיחה.`);
+L.push(gpu ? '✅ ' + t('dGpu') : '⚠️ ' + t('dNoGpu'));
+L.push(typeof Translator !== 'undefined' ? '✅ ' + t('dTrBuiltin') : '⚠️ ' + t('dNoTrBuiltin'));
+L.push(navigator.clipboard?.readText ? '✅ ' + t('dClip') : '⚠️ ' + t('dNoClip'));
+let ok = false; try { ok = !!(window.caches && await caches.open('vb-probe')); } catch {}
+L.push(ok && /^https?:$/.test(location.protocol) ? '✅ ' + t('dCache')
+: '⚠️ ' + t('dNoCache', location.protocol));
 caps.innerHTML = L.join('<br>');
-if (!full) { say(stD, 'הקש "בדוק מערכת" לבדיקת תרגום חיה.'); return; }
-say(stD, 'בודק תרגום בשני הכיוונים…');
-for (const [f, t, s] of [['en','he','This is a test.'], ['he','en','זאת בדיקה.']]) {
-try { const r = await translate(s, f, t, () => {}); L.push(`✅ ${LBL[f]}→${LBL[t]} (${r.via}) → ${r.text}`); }
-catch (e) { L.push(`❌ ${LBL[f]}→${LBL[t]} נכשל: ${e.message}`); }
+if (!full) { say(stD, t('dTapCheck')); return; }
+say(stD, t('dChecking'));
+for (const [f, to, s] of [['en','he','This is a test.'], ['he','en','זאת בדיקה.']]) {
+try { const r = await translate(s, f, to, () => {}); L.push('✅ ' + t('dTrOk', LBL()[f], LBL()[to], r.via, r.text)); }
+catch (e) { L.push('❌ ' + t('dTrFail', LBL()[f], LBL()[to], e.message)); }
 caps.innerHTML = L.join('<br>');
 }
-say(stD, 'הבדיקה הושלמה.', 'ok');
+say(stD, t('dDone'), 'ok');
 };
 window.preload = async () => {
-say(stD, 'מוריד מודל…');
+say(stD, t('preloading'));
 try {
-await _7((p, f) => say(stD, `מוריד ${Math.round(p)}% ${f ? '· ' + f : ''}`));
-say(stD, '✓ המודל מוכן ושמור. מעכשיו התמלול יתחיל מיד.', 'ok');
+await _7((p, f) => say(stD, t('preloadPct', Math.round(p), f ? '· ' + f : '')));
+say(stD, t('preloadOk'), 'ok');
 } catch (e) { say(stD, '⚠ ' + e.message, 'err'); }
 };
 const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent);
 (isIOS ? iosTip : shareTip).classList.remove('hide');
+applyLang();
+runDiag(false);
+setTimeout(loadVoices, 400); setTimeout(loadVoices, 1500);
 (async () => {
 const kind = new URLSearchParams(location.search).get('shared');
 if (!kind || !window.caches) return;
@@ -647,22 +801,21 @@ const name = decodeURIComponent(r.headers.get('x-filename') || 'voice-note');
 await cache.delete('shared-audio');
 setTab('A');
 _9(new File([blob], name, { type: blob.type || 'audio/ogg' }));
-say(stA, 'התקבלה הקלטה משיתוף — מתחיל…', 'ok');
+say(stA, t('sharedAudio'), 'ok');
 goA();
 }
 } else if (kind === 'text') {
 const r = await cache.match('shared-text');
 if (r) {
-const t = (await r.text()).trim();
+const x = (await r.text()).trim();
 await cache.delete('shared-text');
-setTab('B'); txtB.value = t; syncB();
-say(stB, 'התקבל טקסט משיתוף.', 'ok');
+setTab('B'); txtB.value = x; syncB();
+delete stB.dataset.k; say(stB, t('sharedText'), 'ok');
 }
 }
-} catch (e) {  }
+} catch (e) {}
 history.replaceState({}, '', './index.html');
 })();
-syncA(); syncB(); runDiag(false);
 </script>
 <script>
 if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {

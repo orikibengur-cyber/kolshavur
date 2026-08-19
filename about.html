@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b0f17">
-<title>קול־שבור — הודעות קוליות באנגלית, בעברית</title>
-<meta name="description" content="חבר שולח לך הודעה קולית באנגלית ואתה באוטובוס? קול־שבור הופך אותה לטקסט בעברית. או להפך — מקריא לך הודעה באנגלית בקול עברי כשאתה נוהג. חינם, בלי הרשמה.">
-<meta property="og:title" content="קול־שבור — הודעות קוליות באנגלית, בעברית">
-<meta property="og:description" content="הודעה קולית באנגלית ← טקסט בעברית. הודעה בטקסט ← קול בעברית. הכול רץ בטלפון שלך. חינם.">
+<title>קול־שבור · Voice Bridge</title>
+<meta name="description" content="Read English voice notes as Hebrew text, or have a message read aloud to you. Free, no sign-up, runs on your phone. · הודעות קוליות באנגלית ← טקסט בעברית.">
+<meta property="og:title" content="קול־שבור · Voice Bridge">
+<meta property="og:description" content="English voice note → Hebrew text. Text → spoken Hebrew. Runs entirely on your phone. Free.">
 <meta property="og:type" content="website">
 <style>
 :root{--bg:#0b0f17;--panel:#141a26;--panel2:#1b2333;--line:#27324a;
@@ -16,9 +16,14 @@
 html,body{margin:0;background:var(--bg);color:var(--txt);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Rubik,Arial,sans-serif;
   line-height:1.7;-webkit-font-smoothing:antialiased}
-.wrap{max-width:640px;margin:0 auto;padding:34px 20px 60px}
+.wrap{max-width:640px;margin:0 auto;padding:20px 20px 60px}
 
-.hero{text-align:center;margin-bottom:38px}
+.langbar{display:flex;justify-content:flex-end;margin-bottom:8px}
+#lang{appearance:none;border:1px solid var(--line);background:var(--panel2);color:var(--txt);
+  font-family:inherit;font-size:13px;font-weight:700;padding:9px 14px;border-radius:10px;cursor:pointer}
+#lang:active{transform:scale(.96)}
+
+.hero{text-align:center;margin-bottom:34px}
 .logo{width:72px;height:72px;border-radius:20px;margin:0 auto 18px;
   background:linear-gradient(135deg,var(--accent),var(--accent2));
   display:grid;place-items:center;font-size:36px}
@@ -36,7 +41,7 @@ h2{font-size:20px;margin:36px 0 14px;font-weight:700}
   padding:20px;margin-bottom:12px}
 .case b{display:block;font-size:17px;margin-bottom:6px}
 .case p{margin:0;color:var(--dim);font-size:15px}
-.case .em{font-size:26px;float:left;margin-right:14px;margin-left:4px}
+.case .em{font-size:26px;float:inline-start;margin-inline-end:14px}
 
 ol{padding-inline-start:22px;margin:0}
 ol li{margin-bottom:13px;color:var(--dim)}
@@ -50,69 +55,130 @@ ol li b{color:var(--txt)}
 
 footer{text-align:center;margin-top:44px;padding-top:24px;border-top:1px solid var(--line);
   color:var(--dim);font-size:13px}
-footer a{color:var(--accent);text-decoration:none}
 </style>
 </head>
 <body>
 <div class="wrap">
 
+  <div class="langbar"><button id="lang" onclick="toggleLang()">English</button></div>
+
   <div class="hero">
     <div class="logo">🎧</div>
-    <h1>קול־שבור</h1>
-    <p class="tag">הודעות קוליות באנגלית — קרא אותן בעברית.<br>
-       הודעות בטקסט — תן לטלפון להקריא לך אותן.</p>
+    <h1 data-t="name"></h1>
+    <p class="tag" data-t="tag"></p>
   </div>
 
-  <a class="cta" href="./index.html">פתח את האפליקציה ←</a>
-  <div class="free">חינם · בלי הרשמה · בלי פרסומות</div>
+  <a class="cta" id="cta" href="./index.html"></a>
+  <div class="free" data-t="free"></div>
 
-  <h2>למה זה קיים</h2>
+  <h2 data-t="whyH"></h2>
 
   <div class="case">
     <span class="em">🔇</span>
-    <b>אתה במקום ציבורי</b>
-    <p>מישהו שלח הודעה קולית של דקה באנגלית. אתה באוטובוס, בלי אוזניות, ולא הולך להשמיע את זה בקול.
-       שלח את ההקלטה לכאן — תקבל טקסט בעברית, בגופן גדול, קריא.</p>
+    <b data-t="case1t"></b>
+    <p data-t="case1p"></p>
   </div>
 
   <div class="case">
     <span class="em">🚗</span>
-    <b>אתה נוהג</b>
-    <p>הגיעה הודעה ארוכה באנגלית ואי אפשר לקרוא תוך כדי נהיגה.
-       הדבק אותה כאן ולחץ פעם אחת — הטלפון יקריא לך אותה בעברית.</p>
+    <b data-t="case2t"></b>
+    <p data-t="case2p"></p>
   </div>
 
-  <h2>איך מתקינים</h2>
+  <h2 data-t="installH"></h2>
   <div class="box">
     <ol>
-      <li><b>פתח את הקישור בכרום</b> בטלפון.</li>
-      <li>תפריט ⋮ ← <b>התקן אפליקציה</b> (או "הוסף למסך הבית"). מקבלים אייקון רגיל.</li>
-      <li>פתח את ההגדרות ← <b>הורד מודל מראש</b>, ברשת אלחוטית.
-          הורדה חד־פעמית של כ־145MB. אחריה הכול עובד מיד, וגם בלי אינטרנט.</li>
+      <li data-t="step1"></li>
+      <li data-t="step2"></li>
+      <li data-t="step3"></li>
     </ol>
   </div>
 
-  <h2>הפרטיות שלך</h2>
+  <h2 data-t="privacyH"></h2>
   <div class="box privacy">
-    <p><b>ההקלטות לא עוזבות את הטלפון.</b> התמלול מתבצע בדפדפן שלך, על המכשיר עצמו,
-       באמצעות מודל שיושב בזיכרון הדפדפן. אין שרת שמקבל את ההקלטה, אין חשבון, אין מה למחוק.</p>
-    <p>רק הטקסט המתומלל נשלח לשירות תרגום — וגם זה רק אם ביקשת תרגום.</p>
+    <p data-t="priv1"></p>
+    <p data-t="priv2"></p>
   </div>
 
-  <h2>מה כדאי לדעת מראש</h2>
+  <h2 data-t="limitsH"></h2>
   <div class="box limits">
-    <p><b>ההקלטות צריכות להיות באנגלית.</b> ניסיתי גם עברית והדיוק היה נמוך מדי, אז הורדתי את זה.
-       הקראת טקסט עובדת בשתי השפות.</p>
-    <p><b>הפעם הראשונה איטית.</b> המודל צריך לרדת, ובלי האצת חומרה בטלפון תמלול של דקה
-       יכול לקחת בערך דקה. אחרי זה זה מהיר יותר.</p>
-    <p><b>התרגום חינמי, ולכן לא מושלם.</b> הוא מבין את המשמעות, אבל לפעמים מנסח מגושם.</p>
+    <p data-t="lim1"></p>
+    <p data-t="lim2"></p>
+    <p data-t="lim3"></p>
   </div>
 
-  <footer>
-    שימוש חופשי · ללא עלות<br>
-    נבנה כי באמת הייתי צריך את זה.
-  </footer>
-
+  <footer data-t="footer"></footer>
 </div>
+
+<script>
+const T = {
+he:{
+ title:'קול־שבור — הודעות קוליות באנגלית, בעברית',
+ name:'קול־שבור',
+ tag:'הודעות קוליות באנגלית — קרא אותן בעברית.<br>הודעות בטקסט — תן לטלפון להקריא לך אותן.',
+ cta:'פתח את האפליקציה ←',
+ free:'חינם · בלי הרשמה · בלי פרסומות',
+ whyH:'למה זה קיים',
+ case1t:'אתה במקום ציבורי',
+ case1p:'מישהו שלח הודעה קולית של דקה באנגלית. אתה באוטובוס, בלי אוזניות, ולא הולך להשמיע את זה בקול. שלח את ההקלטה לכאן — תקבל טקסט בעברית, בגופן גדול, קריא.',
+ case2t:'אתה נוהג',
+ case2p:'הגיעה הודעה ארוכה באנגלית ואי אפשר לקרוא תוך כדי נהיגה. הדבק אותה כאן ולחץ פעם אחת — הטלפון יקריא לך אותה בעברית.',
+ installH:'איך מתקינים',
+ step1:'<b>פתח את הקישור בכרום</b> בטלפון.',
+ step2:'תפריט ⋮ ← <b>התקן אפליקציה</b>. מקבלים אייקון רגיל, ואפשר לשתף הודעות קוליות ישירות מוואטסאפ.',
+ step3:'פתח את ההגדרות ← <b>הורד מודל מראש</b>, ברשת אלחוטית. הורדה חד־פעמית של כ־145MB. אחריה הכול עובד מיד, וגם בלי אינטרנט.',
+ privacyH:'הפרטיות שלך',
+ priv1:'<b>ההקלטות לא עוזבות את הטלפון.</b> התמלול מתבצע בדפדפן שלך, על המכשיר עצמו. אין שרת שמקבל את ההקלטה, אין חשבון, אין מה למחוק.',
+ priv2:'רק הטקסט המתומלל נשלח לשירות תרגום — וגם זה רק אם ביקשת תרגום.',
+ limitsH:'מה כדאי לדעת מראש',
+ lim1:'<b>ההקלטות צריכות להיות באנגלית.</b> ניסיתי גם עברית והדיוק היה נמוך מדי, אז הורדתי את זה. הקראת טקסט עובדת בשתי השפות.',
+ lim2:'<b>הפעם הראשונה איטית.</b> המודל צריך לרדת, ובלי האצת חומרה בטלפון תמלול של דקה יכול לקחת בערך דקה. אחרי זה זה מהיר יותר.',
+ lim3:'<b>התרגום חינמי, ולכן לא מושלם.</b> הוא מבין את המשמעות, אבל לפעמים מנסח מגושם.',
+ footer:'שימוש חופשי · ללא עלות<br>נבנה כי באמת הייתי צריך את זה.',
+},
+en:{
+ title:'Voice Bridge — read English voice notes, hear your messages',
+ name:'Voice Bridge',
+ tag:'English voice notes — read them instead of playing them.<br>Text messages — have your phone read them to you.',
+ cta:'Open the app →',
+ free:'Free · No sign-up · No ads',
+ whyH:'Why it exists',
+ case1t:"You're somewhere public",
+ case1p:"Someone sent a one-minute voice note in English. You're on a bus with no headphones and you're not about to play it out loud. Send the recording here and read it instead — in large, clear type.",
+ case2t:"You're driving",
+ case2p:'A long message arrives and you cannot read it at the wheel. Paste it here, tap once, and your phone reads it aloud — in English or Hebrew, your choice.',
+ installH:'How to install',
+ step1:'<b>Open the link in Chrome</b> on your phone.',
+ step2:'Menu ⋮ → <b>Install app</b>. You get a normal icon, and you can share voice notes to it straight from WhatsApp.',
+ step3:'Open settings → <b>Download model now</b>, on wi-fi. A one-time ~145MB download. After that it starts instantly and works with no signal.',
+ privacyH:'Your privacy',
+ priv1:'<b>Recordings never leave your phone.</b> Transcription runs in your browser, on the device itself. No server receives the audio, there is no account, and there is nothing stored to delete.',
+ priv2:'Only the resulting text is sent to a translation service — and only if you asked for a translation.',
+ limitsH:'What to know first',
+ lim1:'<b>Recordings must be in English.</b> Hebrew speech recognition was tried and removed — the accuracy was too low to ship. Reading text aloud works in both languages.',
+ lim2:'<b>The first run is slow.</b> The model has to download, and without hardware acceleration a one-minute note takes about a minute. It is quicker after that.',
+ lim3:'<b>Translation is free, so it is imperfect.</b> It conveys the meaning, but the phrasing is sometimes clumsy.',
+ footer:'Free to use · No cost<br>Built because I actually needed it.',
+}};
+
+let LANG = localStorage.getItem('vb-lang')
+        || ((navigator.language || '').startsWith('he') ? 'he' : 'en');
+
+function applyLang() {
+  const he = LANG === 'he';
+  document.documentElement.lang = he ? 'he' : 'en';
+  document.documentElement.dir  = he ? 'rtl' : 'ltr';
+  document.getElementById('lang').textContent = he ? 'English' : 'עברית';
+  document.title = T[LANG].title;
+  document.querySelectorAll('[data-t]').forEach(el => { el.innerHTML = T[LANG][el.dataset.t]; });
+  document.getElementById('cta').textContent = T[LANG].cta;
+}
+function toggleLang() {
+  LANG = LANG === 'he' ? 'en' : 'he';
+  localStorage.setItem('vb-lang', LANG);   // the app reads the same key
+  applyLang();
+}
+applyLang();
+</script>
 </body>
 </html>
